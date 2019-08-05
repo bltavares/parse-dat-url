@@ -1,0 +1,8 @@
+[package]
+name = "parse-dat-url"
+version = "0.1.0"
+authors = ["Bruno Tavares <connect+github@bltavares.com>"]
+edition = "2018"
+
+[dependencies]
+url = "2.1.0"
