@@ -35,6 +35,8 @@ impl<'a> DatUrl<'a> {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use super::DatUrl;
 
     const INPUTS: &str =
@@ -225,6 +227,12 @@ foo.com/path/to+file.txt";
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: None,
             href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0",
+        },
+        DatUrl {
+            version: Some("latest"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: None,
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+latest",
         },
     ];
 
