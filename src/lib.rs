@@ -24,7 +24,10 @@ impl<'a> DatUrl<'a> {
                 .name("hostname")
                 .map(|c| c.as_str())
                 .expect("Hostname is required"),
-            path: capture.name("path").map(|c| c.as_str()),
+            path: capture.name("path").and_then(|c| match c.as_str() {
+                "" => None,
+                s => Some(s),
+            }),
             href: url,
         }
     }
@@ -133,12 +136,102 @@ foo.com/path/to+file.txt";
             path: Some("/"),
             href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1/",
         },
+        DatUrl {
+            version: Some("c1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+c1/",
+        },
+        DatUrl {
+            version: Some("v1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1/",
+        },
+        DatUrl {
+            version: Some("v1.0.0"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0/",
+        },
+        DatUrl {
+            version: Some("latest"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+latest/",
+        },
+        DatUrl {
+            version: Some("0.0.0.1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/path/to+file.txt"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt",
+        },
+        DatUrl {
+            version: Some("1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/path/to+file.txt"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1/path/to+file.txt",
+        },
+        DatUrl {
+            version: Some("c1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/path/to+file.txt"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+c1/path/to+file.txt",
+        },
+        DatUrl {
+            version: Some("v1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/path/to+file.txt"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1/path/to+file.txt",
+        },
+        DatUrl {
+            version: Some("v1.0.0"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/path/to+file.txt"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0/path/to+file.txt",
+        },
+        DatUrl {
+            version: Some("latest"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/path/to+file.txt"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+latest/path/to+file.txt",
+        },
+        DatUrl {
+            version: Some("0.0.0.1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: None,
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1",
+        },
+        DatUrl {
+            version: Some("1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: None,
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1",
+        },
+        DatUrl {
+            version: Some("c1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: None,
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+c1",
+        },
+        DatUrl {
+            version: Some("v1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: None,
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1",
+        },
+        DatUrl {
+            version: Some("v1.0.0"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: None,
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0",
+        },
     ];
 
     #[test]
     fn it_parses_the_urls() {
-        for (index, url) in INPUTS.lines().enumerate().take(2) {
-            assert_eq!(DatUrl::parse(url), OUTPUTS[index]);
+        for (url, output) in INPUTS.lines().zip(OUTPUTS) {
+            assert_eq!(&DatUrl::parse(url), output);
         }
     }
 }
