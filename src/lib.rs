@@ -549,6 +549,90 @@ foo.com/path/to+file.txt";
             path: Some("/path/to+file.txt"),
             scheme: "dat://",
         },
+        DatUrl {
+            version: Some("1"),
+            host: "foo.com",
+            path: Some("/path/to+file.txt"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("c1"),
+            host: "foo.com",
+            path: Some("/path/to+file.txt"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("v1"),
+            host: "foo.com",
+            path: Some("/path/to+file.txt"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("v1.0.0"),
+            host: "foo.com",
+            path: Some("/path/to+file.txt"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("latest"),
+            host: "foo.com",
+            path: Some("/path/to+file.txt"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("0.0.0.1"),
+            host: "foo.com",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("1"),
+            host: "foo.com",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("c1"),
+            host: "foo.com",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("v1"),
+            host: "foo.com",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("v1.0.0"),
+            host: "foo.com",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("latest"),
+            host: "foo.com",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: None,
+            host: "foo.com",
+            path: Some("/"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: None,
+            host: "foo.com",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: None,
+            host: "foo.com",
+            path: Some("/path/to+file.txt"),
+            scheme: "dat://",
+        },
     ];
 
     #[test]
@@ -556,5 +640,6 @@ foo.com/path/to+file.txt";
         for (url, output) in INPUTS.lines().zip(OUTPUTS) {
             assert_eq!(&DatUrl::parse(url), output);
         }
+        assert_eq!(INPUTS.lines().count(), OUTPUTS.len());
     }
 }
