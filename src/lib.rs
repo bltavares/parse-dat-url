@@ -3,20 +3,20 @@ use regex::Regex;
 
 lazy_static! {
 // static ref SCHEME_REGEX: Regex = Regex::new(r#"(?i)[a-z]+://"#).expect("Scheme regex should be valid");
-static ref VERSION_REGEX: Regex = Regex::new(r#"(?i)^(?P<scheme>dat://)?(?P<hostname>[^/]+)(\+(?P<version>[^/]+))(?P<path>.*)$"#).expect("Version rege should be valid");
+static ref VERSION_REGEX: Regex = Regex::new(r#"(?i)^(?P<scheme>dat://)?(?P<hostname>[^/+]+)(\+(?P<version>[^/]+))?(?P<path>.*)$"#).expect("Version rege should be valid");
 }
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct DatUrl<'a> {
-    version: Option<&'a str>,
+    scheme: &'a str,
     host: &'a str,
+    version: Option<&'a str>,
     path: Option<&'a str>,
-    href: &'a str,
 }
 
 impl<'a> DatUrl<'a> {
     pub fn parse(url: &str) -> DatUrl {
-        let capture = VERSION_REGEX.captures(url).expect("Valid dat url");
+        let capture = VERSION_REGEX.captures(url).expect("Invalid dat url");
 
         DatUrl {
             version: capture.name("version").map(|c| c.as_str()),
@@ -28,7 +28,10 @@ impl<'a> DatUrl<'a> {
                 "" => None,
                 s => Some(s),
             }),
-            href: url,
+            scheme: capture
+                .name("scheme")
+                .map(|c| c.as_str())
+                .unwrap_or("dat://"),
         }
     }
 }
@@ -130,109 +133,139 @@ foo.com/path/to+file.txt";
             version: Some("0.0.0.1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1/",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("c1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+c1/",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("v1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1/",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("v1.0.0"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0/",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("latest"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+latest/",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("0.0.0.1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/path/to+file.txt"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/path/to+file.txt"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1/path/to+file.txt",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("c1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/path/to+file.txt"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+c1/path/to+file.txt",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("v1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/path/to+file.txt"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1/path/to+file.txt",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("v1.0.0"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/path/to+file.txt"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0/path/to+file.txt",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("latest"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: Some("/path/to+file.txt"),
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+latest/path/to+file.txt",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("0.0.0.1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: None,
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: None,
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("c1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: None,
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+c1",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("v1"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: None,
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("v1.0.0"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: None,
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0",
+            scheme: "dat://",
         },
         DatUrl {
             version: Some("latest"),
             host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
             path: None,
-            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+latest",
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: None,
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: None,
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/path/to+file.txt"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: None,
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: None,
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("0.0.0.1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            scheme: "dat://",
+        },
+        DatUrl {
+            version: Some("1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            scheme: "dat://",
         },
     ];
 
