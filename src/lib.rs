@@ -1,3 +1,11 @@
+use lazy_static::lazy_static;
+use regex::Regex;
+
+lazy_static! {
+// static ref SCHEME_REGEX: Regex = Regex::new(r#"(?i)[a-z]+://"#).expect("Scheme regex should be valid");
+static ref VERSION_REGEX: Regex = Regex::new(r#"(?i)^(?P<scheme>dat://)?(?P<hostname>[^/]+)(\+(?P<version>[^/]+))(?P<path>.*)$"#).expect("Version rege should be valid");
+}
+
 #[derive(Debug, Eq, PartialEq)]
 pub struct DatUrl<'a> {
     version: Option<&'a str>,
@@ -8,10 +16,15 @@ pub struct DatUrl<'a> {
 
 impl<'a> DatUrl<'a> {
     pub fn parse(url: &str) -> DatUrl {
+        let capture = VERSION_REGEX.captures(url).expect("Valid dat url");
+
         DatUrl {
-            version: Some("0.0.0.1"),
-            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
-            path: Some("/"),
+            version: capture.name("version").map(|c| c.as_str()),
+            host: capture
+                .name("hostname")
+                .map(|c| c.as_str())
+                .expect("Hostname is required"),
+            path: capture.name("path").map(|c| c.as_str()),
             href: url,
         }
     }
@@ -107,16 +120,24 @@ foo.com/
 foo.com
 foo.com/path/to+file.txt";
 
-    const OUTPUTS: &[DatUrl] = &[DatUrl {
-        version: Some("0.0.0.1"),
-        host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
-        path: Some("/"),
-        href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/",
-    }];
+    const OUTPUTS: &[DatUrl] = &[
+        DatUrl {
+            version: Some("0.0.0.1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/",
+        },
+        DatUrl {
+            version: Some("1"),
+            host: "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+            path: Some("/"),
+            href: "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1/",
+        },
+    ];
 
     #[test]
     fn it_parses_the_urls() {
-        for (index, url) in INPUTS.lines().enumerate().take(1) {
+        for (index, url) in INPUTS.lines().enumerate().take(2) {
             assert_eq!(DatUrl::parse(url), OUTPUTS[index]);
         }
     }
