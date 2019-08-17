@@ -1,5 +1,5 @@
 use parse_dat_url::DatUrl;
-use parse_dat_url::Error as ParseError;
+use url::Url;
 use pretty_assertions::assert_eq;
 
 #[test]
@@ -30,5 +30,19 @@ fn it_becomes_owned() {
             "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/"
         )
         .expect("invalid test data")
+    )
+}
+
+
+#[test]
+fn dat_url_struct_is_also_a_valid_url() {
+    assert_eq!(
+        Url::parse(
+            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21/"
+        ).expect("invalid test data"),
+        DatUrl::parse(
+            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/"
+        ).expect("invalid test data")
+        .into()
     )
 }

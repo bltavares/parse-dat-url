@@ -63,16 +63,19 @@ impl<'a> DatUrl<'a> {
     }
 
     pub fn url_str(&self) -> String {
-        format!("{}{}{}", self.scheme, self.host, self.path.as_ref().unwrap_or_default())
+        format!(
+            "{}{}{}",
+            self.scheme,
+            self.host,
+            self.path.as_ref().map_or("", |path| &path)
+        )
     }
 }
 
 impl<'a> From<DatUrl<'a>> for Url {
-
-fn from(dat_url: DatUrl<'a>) -> Self {
-Url::parse(&dat_url.url_str()).expect("invalid daturl object")
-
-}
+    fn from(dat_url: DatUrl<'a>) -> Self {
+        Url::parse(&dat_url.url_str()).expect("invalid daturl object")
+    }
 }
 
 // #[cfg(test)]
