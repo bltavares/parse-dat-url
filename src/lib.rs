@@ -2,6 +2,7 @@ use core::fmt;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::borrow::Cow;
+use std::str::FromStr;
 use url::Url;
 
 lazy_static! {
@@ -107,6 +108,20 @@ impl<'a> DatUrl<'a> {
     }
 }
 
+impl<'a> FromStr for DatUrl<'a> {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        DatUrl::parse(s).map(DatUrl::into_owned)
+    }
+}
+
+impl<'a> AsRef<Url> for DatUrl<'a> {
+    #[inline]
+    fn as_ref(&self) -> &Url {
+        &self.url
+    }
+}
 
 impl<'a> From<DatUrl<'a>> for Url {
     #[inline]

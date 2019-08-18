@@ -4,6 +4,48 @@ use pretty_assertions::assert_eq;
 use url::Url;
 
 #[test]
+fn it_exposes_the_fields() {
+    let dat = DatUrl::parse(
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
+    )
+    .expect("Invalid test data");
+
+    assert_eq!("dat://", dat.scheme());
+    assert_eq!(
+        "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21",
+        dat.host()
+    );
+    assert_eq!(&Some("0.0.0.1".into()), dat.version());
+    assert_eq!(&Some("/file.txt".into()), dat.path());
+}
+
+#[test]
+fn parses_from_str() {
+    assert_eq!(
+    DatUrl::parse(
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
+    ),
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt".parse()
+    );
+}
+
+#[test]
+fn coerces_to_url() {
+    let dat = DatUrl::parse(
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
+    )
+    .expect("Invalid test data");
+    let as_url: &Url = &dat.as_ref();
+    assert_eq!(
+        as_url,
+        &Url::parse(
+            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21/file.txt"
+        )
+        .expect("Invalid test data")
+    );
+}
+
+#[test]
 fn it_deals_with_owned_strings() {
     assert_eq!(
         DatUrl::parse(
