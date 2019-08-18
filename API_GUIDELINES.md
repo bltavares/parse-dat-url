@@ -1,22 +1,22 @@
 # [Rust API Guidelines Checklist](https://rust-lang-nursery.github.io/api-guidelines/checklist.html)
 
 - **Naming** *(crate aligns with Rust naming conventions)*
-  - [ ] Casing conforms to RFC 430 ([C-CASE])
-  - [ ] Ad-hoc conversions follow `as_`, `to_`, `into_` conventions ([C-CONV])
-  - [ ] Getter names follow Rust convention ([C-GETTER])
+  - [x] Casing conforms to RFC 430 ([C-CASE])
+  - [x] Ad-hoc conversions follow `as_`, `to_`, `into_` conventions ([C-CONV])
+  - [x] Getter names follow Rust convention ([C-GETTER])
   - [ ] Methods on collections that produce iterators follow `iter`, `iter_mut`, `into_iter` ([C-ITER])
   - [ ] Iterator type names match the methods that produce them ([C-ITER-TY])
   - [ ] Feature names are free of placeholder words ([C-FEATURE])
-  - [ ] Names use a consistent word order ([C-WORD-ORDER])
+  - [x] Names use a consistent word order ([C-WORD-ORDER])
 - **Interoperability** *(crate interacts nicely with other library functionality)*
-  - [ ] Types eagerly implement common traits ([C-COMMON-TRAITS])
+  - [x] Types eagerly implement common traits ([C-COMMON-TRAITS])
     - `Copy`, `Clone`, `Eq`, `PartialEq`, `Ord`, `PartialOrd`, `Hash`, `Debug`,
       `Display`, `Default`
-  - [ ] Conversions use the standard traits `From`, `AsRef`, `AsMut` ([C-CONV-TRAITS])
+  - [x] Conversions use the standard traits `From`, `AsRef`, `AsMut` ([C-CONV-TRAITS])
   - [ ] Collections implement `FromIterator` and `Extend` ([C-COLLECT])
   - [ ] Data structures implement Serde's `Serialize`, `Deserialize` ([C-SERDE])
-  - [ ] Types are `Send` and `Sync` where possible ([C-SEND-SYNC])
-  - [ ] Error types are meaningful and well-behaved ([C-GOOD-ERR])
+  - [x] Types are `Send` and `Sync` where possible ([C-SEND-SYNC])
+  - [x] Error types are meaningful and well-behaved ([C-GOOD-ERR])
   - [ ] Binary number types provide `Hex`, `Octal`, `Binary` formatting ([C-NUM-FMT])
   - [ ] Generic reader/writer functions take `R: Read` and `W: Write` by value ([C-RW-VALUE])
 - **Macros** *(crate presents well-behaved macros)*
@@ -26,15 +26,15 @@
   - [ ] Item macros support visibility specifiers ([C-MACRO-VIS])
   - [ ] Type fragments are flexible ([C-MACRO-TY])
 - **Documentation** *(crate is abundantly documented)*
-  - [ ] Crate level docs are thorough and include examples ([C-CRATE-DOC])
-  - [ ] All items have a rustdoc example ([C-EXAMPLE])
+  - [!] Crate level docs are thorough and include examples ([C-CRATE-DOC])
+  - [!] All items have a rustdoc example ([C-EXAMPLE])
   - [ ] Examples use `?`, not `try!`, not `unwrap` ([C-QUESTION-MARK])
   - [ ] Function docs include error, panic, and safety considerations ([C-FAILURE])
   - [ ] Prose contains hyperlinks to relevant things ([C-LINK])
   - [ ] Cargo.toml includes all common metadata ([C-METADATA])
     - authors, description, license, homepage, documentation, repository,
       readme, keywords, categories
-  - [ ] Crate sets html_root_url attribute "https://docs.rs/CRATE/X.Y.Z" ([C-HTML-ROOT])
+  - [!] Crate sets html_root_url attribute "https://docs.rs/CRATE/X.Y.Z" ([C-HTML-ROOT])
   - [ ] Release notes document all significant changes ([C-RELNOTES])
   - [ ] Rustdoc does not show unhelpful implementation details ([C-HIDDEN])
 - **Predictability** *(crate enables legible code that acts how it looks)*

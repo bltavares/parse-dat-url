@@ -91,7 +91,10 @@ fn dat_url_struct_is_also_a_valid_url() {
 
 #[test]
 fn invalid_url_is_not_valid() {
-    assert_eq!(DatUrl::parse("dat://["), Err(ParseError::InvalidUrl))
+    assert_eq!(
+        DatUrl::parse("dat://["),
+        Err(ParseError::InvalidUrl(url::ParseError::InvalidIpv6Address))
+    )
 }
 
 #[test]

@@ -1,3 +1,6 @@
+#![doc(html_root_url = "https://docs.rs/parse-dat-url/0.1.0/")]
+#![warn(missing_docs)]
+
 use core::fmt;
 use core::str::FromStr;
 use lazy_static::lazy_static;
@@ -23,7 +26,8 @@ pub struct DatUrl<'a> {
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error {
-    InvalidUrl,
+    InvalidRegex,
+    InvalidUrl(url::ParseError),
     MissingHostname,
 }
 
@@ -46,7 +50,7 @@ impl<'a> DatUrl<'a> {
     }
 
     pub fn parse(url: &str) -> Result<DatUrl, Error> {
-        let capture = VERSION_REGEX.captures(url).ok_or(Error::InvalidUrl)?;
+        let capture = VERSION_REGEX.captures(url).ok_or(Error::InvalidRegex)?;
 
         let version = capture.name("version").map(|c| c.as_str());
 
@@ -65,8 +69,8 @@ impl<'a> DatUrl<'a> {
             .map(|c| c.as_str())
             .unwrap_or("dat://");
 
-        let valid_url =
-            Url::parse(&DatUrl::url_str(&scheme, &host, &path)).map_err(|_| Error::InvalidUrl)?;
+        let valid_url = Url::parse(&DatUrl::url_str(&scheme, &host, &path))
+            .map_err(|e| Error::InvalidUrl(e))?;
 
         Ok(DatUrl {
             version: version.map(Cow::from),

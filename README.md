@@ -1,5 +1,7 @@
 # parse-dat-url
 
+![Docs](https://docs.rs/parse-dat-url/badge.svg)
+
 ```rust
 use parse_dat_url::DatUrl;
 
