@@ -1,9 +1,23 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(all(feature = "alloc", not(feature = "std")), feature(alloc))]
+
 use core::fmt;
+use core::str::FromStr;
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::borrow::Cow;
-use std::str::FromStr;
 use url::Url;
+
+#[cfg(all(feature = "alloc", not(feature = "std")))]
+mod compat {
+    pub use alloc::borrow::Cow;
+    pub use alloc::string::{String, ToString};
+}
+#[cfg(feature = "std")]
+mod compat {
+    pub use std::borrow::Cow;
+}
+
+use crate::compat::*;
 
 lazy_static! {
     static ref VERSION_REGEX: Regex = Regex::new(
