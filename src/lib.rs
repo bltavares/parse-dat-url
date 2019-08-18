@@ -1,8 +1,8 @@
 use core::fmt;
+use core::str::FromStr;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::borrow::Cow;
-use std::str::FromStr;
 use url::Url;
 
 lazy_static! {
