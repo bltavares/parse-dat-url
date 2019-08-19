@@ -3,7 +3,7 @@
 <a href="https://docs.rs/parse-dat-url">
  <img src="https://docs.rs/parse-dat-url/badge.svg?version=0.1.0" />
 </a>
-<a href="https://crates.io/crates/parse">
+<a href="https://crates.io/crates/parse-dat-url">
   <img src="https://img.shields.io/crates/v/parse-dat-url" />
 </a>
 
