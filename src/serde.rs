@@ -1,5 +1,5 @@
 use crate::DatUrl;
-use serde::de::{self, Visitor};
+use serde::de;
 use serde::ser;
 use std::fmt;
 
@@ -14,26 +14,32 @@ impl<'a> ser::Serialize for DatUrl<'a> {
 
 struct DatUrlVisitor;
 
-impl<'de> Visitor<'de> for DatUrlVisitor {
+impl<'de> de::Visitor<'de> for DatUrlVisitor {
     type Value = DatUrl<'de>;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_str("a string url")
     }
 
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        DatUrl::parse(value)
+            .map_err(de::Error::custom)
+            .map(DatUrl::into_owned)
+    }
+
     fn visit_borrowed_str<E>(self, value: &'de str) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        match DatUrl::parse(value) {
-            Err(_) => Err(de::Error::invalid_value(de::Unexpected::Str(value), &self)),
-            Ok(ok) => Ok(ok),
-        }
+        DatUrl::parse(value).map_err(de::Error::custom)
     }
 }
 
-impl<'de> de::Deserialize<'de> for DatUrl<'de> {
-    fn deserialize<D>(deserializer: D) -> Result<DatUrl<'de>, D::Error>
+impl<'de: 'a, 'a> de::Deserialize<'de> for DatUrl<'a> {
+    fn deserialize<D>(deserializer: D) -> Result<DatUrl<'a>, D::Error>
     where
         D: de::Deserializer<'de>,
     {
