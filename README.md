@@ -34,9 +34,15 @@ parse-dat-url = { version = "0.1.0", default-features = false }
 
 ```rust
 use parse_dat_url::DatUrl;
+use parse_dat_url::Error as DatError;
 
-fn main() {
-    let url = DatUrl::parse("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+v1.0.0/path/to/file.txt");
+fn main() -> Result<(), DatError> {
+  let url = "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt";
+
+  let dat_url = DatUrl::parse(&url)?;
+  println!("{}", dat_url);
+
+  Ok(())
 }
 ```
 

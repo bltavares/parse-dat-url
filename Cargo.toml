@@ -21,8 +21,9 @@ serde = { version = "1.0.99", optional = true }
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
-version-sync = "0.8.1"
 serde_test = "1.0.99"
+version-sync = "0.8.1"
+doc-comment = "0.3.1"
 
 [[test]]
 name = "serde"

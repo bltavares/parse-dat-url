@@ -10,6 +10,22 @@
 //! - [How dat works](https://datprotocol.github.io/how-dat-works/) - Detailed Guide
 //! - [datprocol](https://github.com/datprotocol) - Main implementation
 //! - [datrs](https://github.com/datrs/) - Rust implementation
+//!
+//! ### Example
+//!
+//! ```rust
+//! use parse_dat_url::DatUrl;
+//! use parse_dat_url::Error as DatError;
+//!
+//! fn main() -> Result<(), DatError> {
+//!   let url = "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt";
+//!
+//!   let dat_url = DatUrl::parse(&url)?;
+//!   println!("{}", dat_url);
+//!
+//!   Ok(())
+//! }
+//! ```
 
 use core::fmt;
 use core::str::FromStr;
@@ -62,10 +78,11 @@ impl std::error::Error for Error {}
 ///
 /// ```rust
 /// use parse_dat_url::DatUrl;
+/// let url = "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt";
 ///
-/// if let Ok(dat_url) = DatUrl::parse("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt") {
-///   println!("{}", dat_url);
-/// }
+/// let dat_url = DatUrl::parse(&url)?;
+/// println!("{}", dat_url);
+/// # Ok::<(), parse_dat_url::Error>(())
 /// ```
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct DatUrl<'a> {
@@ -219,6 +236,12 @@ mod tests {
 
     use super::DatUrl;
     use url::Url;
+
+    // TODO:
+    // - https://github.com/rust-lang/rust/issues/45599
+    // - https://github.com/rust-lang/rust/pull/63201
+    #[cfg(doctest)]
+    doc_comment::doctest!("../README.md");
 
     #[test]
     fn it_parses_the_urls() {
