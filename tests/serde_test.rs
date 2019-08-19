@@ -14,5 +14,8 @@ fn it_serializes_with_serde() -> Result<(), ParseError> {
     assert_tokens(&dat, &[
         Token::Str("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path.txt"),
     ]);
+    assert_tokens(&dat, &[
+        Token::String("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path.txt"),
+    ]);
     Ok(())
 }

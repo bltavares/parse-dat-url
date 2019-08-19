@@ -67,7 +67,7 @@ impl std::error::Error for Error {}
 ///   println!("{}", dat_url);
 /// }
 /// ```
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct DatUrl<'a> {
     scheme: Cow<'a, str>,
     host: Cow<'a, str>,
