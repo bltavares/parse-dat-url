@@ -1,6 +1,7 @@
 use parse_dat_url::DatUrl;
 use parse_dat_url::Error as ParseError;
 use pretty_assertions::assert_eq;
+use std::convert::TryInto;
 use url::Url;
 
 #[test]
@@ -26,6 +27,16 @@ fn parses_from_str() {
         "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
     ),
         "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt".parse()
+    );
+}
+
+#[test]
+fn try_from_str() {
+    assert_eq!(
+    DatUrl::parse(
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
+    ),
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt".try_into()
     );
 }
 
@@ -91,7 +102,10 @@ fn dat_url_struct_is_also_a_valid_url() {
 
 #[test]
 fn invalid_url_is_not_valid() {
-    assert_eq!(DatUrl::parse("dat://["), Err(ParseError::InvalidUrl))
+    assert_eq!(
+        DatUrl::parse("dat://["),
+        Err(ParseError::InvalidUrl(url::ParseError::InvalidIpv6Address))
+    )
 }
 
 #[test]
