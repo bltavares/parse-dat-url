@@ -5,12 +5,26 @@ authors = ["Bruno Tavares <connect+github@bltavares.com>"]
 edition = "2018"
 keywords = ["dat"]
 readme = "README.md"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/bltavares/parse-dat-url"
+documentation = "https://docs.rs/parse-dat-url"
+description = "url parser to support versioned dat URLs"
+
+[features]
+default = ["serde"]
 
 [dependencies]
 url = "2.1.0"
 regex = "1.2.1"
 lazy_static = "1.3.0"
+serde = { version = "1.0.99", optional = true }
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
 version-sync = "0.8.1"
+serde_test = "1.0.99"
+
+[[test]]
+name = "serde"
+path = "tests/serde_test.rs"
+required-features = ["serde"]

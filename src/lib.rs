@@ -1,5 +1,15 @@
 #![doc(html_root_url = "https://docs.rs/parse-dat-url/0.1.0/")]
-#![warn(missing_docs)]
+#![deny(missing_docs)]
+
+//! # parse-dat-url
+//! url parser to support versioned [dat](https://dat.foundation) URLs
+//!
+//! Useful links:
+//!
+//! - [dat.foundation](https://dat.foundation) - Main webpage
+//! - [How dat works](https://datprotocol.github.io/how-dat-works/) - Detailed Guide
+//! - [datprocol](https://github.com/datprotocol) - Main implementation
+//! - [datrs](https://github.com/datrs/) - Rust implementation
 
 use core::fmt;
 use core::str::FromStr;
@@ -8,6 +18,9 @@ use regex::Regex;
 use std::borrow::Cow;
 use url::Url;
 
+#[cfg(feature = "serde")]
+mod serde;
+
 lazy_static! {
     static ref VERSION_REGEX: Regex = Regex::new(
         r#"(?i)^(?P<scheme>\w+://)?(?P<hostname>[^/+]+)(\+(?P<version>[^/]+))?(?P<path>.*)$"#
@@ -15,6 +28,45 @@ lazy_static! {
     .expect("Version regex not valid");
 }
 
+/// Possible errors returned by the parsing operation
+#[derive(Debug, Eq, PartialEq)]
+pub enum Error {
+    /// Correspond to invalid regex matching.
+    InvalidRegex,
+    /// Correspond to invalid domain or url, such as bad IPv6 address, or bad encoding on domain names.
+    /// Contains a reference to the original `url` parssing error inside.
+    InvalidUrl(url::ParseError),
+    /// Correspond to missing domain on data.
+    MissingHostname,
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Error::InvalidRegex => write!(f, "regex defined on library can't match the value")?,
+            Error::InvalidUrl(_) => write!(f, "malformed url not conforming to URL Spec")?,
+            Error::MissingHostname => write!(f, "missing hostname on url")?,
+        };
+        Ok(())
+    }
+}
+
+impl std::error::Error for Error {}
+
+/// Main structure exported. It holds a reference to the string itself, but it is capable of becoming owned, in order to send it across threads.
+///
+/// It accepts valid urls as well, such as HTTP, domains or IP based URLs. Mal-formed url data might fail, such as bad formatted IPv6 addresses.
+/// It is capable to clone the structure into a onwed reference, as it uses [Cow](std::borrow::Cow) internally.
+///
+/// # Example
+///
+/// ```rust
+/// use parse_dat_url::DatUrl;
+///
+/// if let Ok(dat_url) = DatUrl::parse("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt") {
+///   println!("{}", dat_url);
+/// }
+/// ```
 #[derive(Debug, Eq, PartialEq)]
 pub struct DatUrl<'a> {
     scheme: Cow<'a, str>,
@@ -22,13 +74,6 @@ pub struct DatUrl<'a> {
     version: Option<Cow<'a, str>>,
     path: Option<Cow<'a, str>>,
     url: Url,
-}
-
-#[derive(Debug, Eq, PartialEq)]
-pub enum Error {
-    InvalidRegex,
-    InvalidUrl(url::ParseError),
-    MissingHostname,
 }
 
 impl<'a> fmt::Display for DatUrl<'a> {
@@ -49,6 +94,9 @@ impl<'a> DatUrl<'a> {
         format!("{}{}{}", scheme, host, path.map_or("", |path| &path))
     }
 
+    /// Main parsing operation. Returns a struct which makes reference to the `&str` passed, with the same lifetime.
+    ///
+    /// It is capable to clone the structure into a onwed reference, as it uses [Cow](std::borrow::Cow) internally.
     pub fn parse(url: &str) -> Result<DatUrl, Error> {
         let capture = VERSION_REGEX.captures(url).ok_or(Error::InvalidRegex)?;
 
@@ -81,6 +129,24 @@ impl<'a> DatUrl<'a> {
         })
     }
 
+    /// Converts a [DatUrl](parse_dat_url::DatUrl) with a `'a` lifetime into a owned struct, with the `'static` lifetime.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// #
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// #
+    /// use parse_dat_url::{DatUrl, Error};
+    /// // A dynamic URL example.
+    /// let url = String::from("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path/to+file.txt");
+    /// let dat_url = DatUrl::parse(&url)?;
+    /// let owned_dat_url : DatUrl<'static> = dat_url.into_owned();
+    /// #
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn into_owned(self) -> DatUrl<'static> {
         DatUrl {
             host: self.host.to_owned().into_owned().into(),
@@ -91,21 +157,25 @@ impl<'a> DatUrl<'a> {
         }
     }
 
+    /// Returns a reference to the scheme used on the url. If no scheme is provided on the string, it fallsback to `dat://`
     #[inline]
     pub fn scheme(&self) -> &Cow<str> {
         &self.scheme
     }
 
+    /// Returns the host part of the url.
     #[inline]
     pub fn host(&self) -> &Cow<str> {
         &self.host
     }
 
+    /// Returns a reference to the version on the dat url, if present.
     #[inline]
     pub fn version(&self) -> &Option<Cow<str>> {
         &self.version
     }
 
+    /// Returns a reference to the path on the dat url, if present.
     #[inline]
     pub fn path(&self) -> &Option<Cow<str>> {
         &self.path
@@ -117,6 +187,15 @@ impl<'a> FromStr for DatUrl<'a> {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         DatUrl::parse(s).map(DatUrl::into_owned)
+    }
+}
+
+impl<'a> std::convert::TryFrom<&'a str> for DatUrl<'a> {
+    type Error = Error;
+
+    #[inline]
+    fn try_from(s: &'a str) -> Result<Self, Self::Error> {
+        DatUrl::parse(s)
     }
 }
 

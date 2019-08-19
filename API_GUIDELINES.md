@@ -26,8 +26,8 @@
   - [ ] Item macros support visibility specifiers ([C-MACRO-VIS])
   - [ ] Type fragments are flexible ([C-MACRO-TY])
 - **Documentation** *(crate is abundantly documented)*
-  - [!] Crate level docs are thorough and include examples ([C-CRATE-DOC])
-  - [!] All items have a rustdoc example ([C-EXAMPLE])
+  - [x] Crate level docs are thorough and include examples ([C-CRATE-DOC])
+  - [x] All items have a rustdoc example ([C-EXAMPLE])
   - [ ] Examples use `?`, not `try!`, not `unwrap` ([C-QUESTION-MARK])
   - [ ] Function docs include error, panic, and safety considerations ([C-FAILURE])
   - [ ] Prose contains hyperlinks to relevant things ([C-LINK])
