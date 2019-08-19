@@ -7,7 +7,8 @@
   <img src="https://img.shields.io/crates/v/parse-dat-url" />
 </a>
 
-url parser to support versioned [dat](https://dat.foundation) URLs
+url parser to support versioned [dat](https://dat.foundation) URLs.
+Adapted from [pfrazee/parse-dat-url](https://github.com/pfrazee/parse-dat-url) implementation in JS.
 
 Useful links:
 
