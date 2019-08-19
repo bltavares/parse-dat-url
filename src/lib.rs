@@ -135,7 +135,7 @@ impl<'a> DatUrl<'a> {
             .unwrap_or("dat://");
 
         let valid_url = Url::parse(&DatUrl::url_str(&scheme, &host, &path))
-            .map_err(|e| Error::InvalidUrl(e))?;
+            .map_err(Error::InvalidUrl)?;
 
         Ok(DatUrl {
             version: version.map(Cow::from),
@@ -244,7 +244,7 @@ mod tests {
     doc_comment::doctest!("../README.md");
 
     #[test]
-    fn it_parses_the_urls() {
+    fn it_parses_the_urls() -> Result<(), super::Error> {
         let inputs: &str =
             "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/
 dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+1/
@@ -980,7 +980,6 @@ example.com/path/to+file.txt
                     "dat://example.com/path/to+file.txt",
                 )
                 .expect("Invalid test data"),
-
             },
             DatUrl {
                 version: Some("0.0.0.1".into()),
@@ -991,7 +990,6 @@ example.com/path/to+file.txt
                     "dat://example.com/",
                 )
                 .expect("Invalid test data"),
-
             },
             DatUrl {
                 version: Some("1".into()),
@@ -1060,7 +1058,7 @@ example.com/path/to+file.txt
                 host: "example.com".into(),
                 path: Some("/path/to+file.txt".into()),
                 scheme: "dat://".into(),
-   url: Url::parse(
+                url: Url::parse(
                     "dat://example.com/path/to+file.txt",
                 )
                 .expect("Invalid test data"),
@@ -1258,8 +1256,9 @@ example.com/path/to+file.txt
         ];
 
         for (url, output) in inputs.lines().zip(outputs) {
-            assert_eq!(&DatUrl::parse(url).expect("Invalid test data"), output);
+            assert_eq!(&DatUrl::parse(url)?, output);
         }
-        // assert_eq!(inputs.lines().count(), outputs.len());
+        assert_eq!(inputs.lines().count(), outputs.len());
+        Ok(())
     }
 }

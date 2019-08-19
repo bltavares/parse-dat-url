@@ -5,11 +5,10 @@ use std::convert::TryInto;
 use url::Url;
 
 #[test]
-fn it_exposes_the_fields() {
+fn it_exposes_the_fields() -> Result<(), ParseError> {
     let dat = DatUrl::parse(
         "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
-    )
-    .expect("Invalid test data");
+    )?;
 
     assert_eq!("dat://", dat.scheme());
     assert_eq!(
@@ -18,14 +17,15 @@ fn it_exposes_the_fields() {
     );
     assert_eq!(&Some("0.0.0.1".into()), dat.version());
     assert_eq!(&Some("/file.txt".into()), dat.path());
+    Ok(())
 }
 
 #[test]
 fn parses_from_str() {
     assert_eq!(
-    DatUrl::parse(
-        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
-    ),
+        DatUrl::parse(
+            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
+        ),
         "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt".parse()
     );
 }
@@ -33,71 +33,60 @@ fn parses_from_str() {
 #[test]
 fn try_from_str() {
     assert_eq!(
-    DatUrl::parse(
-        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
-    ),
+        DatUrl::parse(
+            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
+        ),
         "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt".try_into()
     );
 }
 
 #[test]
-fn coerces_to_url() {
+fn coerces_to_url() -> Result<(), Box<dyn std::error::Error>> {
     let dat = DatUrl::parse(
         "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/file.txt",
-    )
-    .expect("Invalid test data");
-    let as_url: &Url = &dat.as_ref();
-    assert_eq!(
-        as_url,
-        &Url::parse(
-            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21/file.txt"
-        )
-        .expect("Invalid test data")
-    );
+    )?;
+
+    let url = Url::parse(
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21/file.txt",
+    )?;
+
+    assert_eq!(dat.as_ref(), &url);
+    Ok(())
 }
 
 #[test]
 fn it_deals_with_owned_strings() {
-    assert_eq!(
-        DatUrl::parse(
-            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/"
-        ),
-        DatUrl::parse(
-            &"dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/"
-                .to_string()
-        )
-    )
+    let reference =
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/";
+    let owned = reference.to_string();
+
+    assert_eq!(DatUrl::parse(reference), DatUrl::parse(&owned))
 }
 
 #[test]
-fn it_becomes_owned() {
+fn it_becomes_owned() -> Result<(), ParseError> {
+    let reference =
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/";
+
     let dat_url = {
-        let url: String =
-            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/"
-                .into();
-        DatUrl::parse(&url).expect("invalid test data").into_owned()
+        let url = reference.to_string();
+        DatUrl::parse(&url)?.into_owned()
     };
 
-    assert_eq!(
-        dat_url,
-        DatUrl::parse(
-            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/"
-        )
-        .expect("invalid test data")
-    )
+    assert_eq!(dat_url, DatUrl::parse(reference)?);
+    Ok(())
 }
 
 #[test]
-fn dat_url_struct_is_also_a_valid_url() {
+fn dat_url_struct_is_also_a_valid_url() -> Result<(), Box<dyn std::error::Error>> {
+    let dat_url = DatUrl::parse(
+        "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/",
+    )?;
     assert_eq!(
-        Url::parse("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21/")
-            .expect("invalid test data"),
-        DatUrl::parse(
-            "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/"
-        )
-        .expect("invalid test data")
-        .into()
-    )
+        Url::parse("dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21/")?,
+        dat_url.into()
+    );
+    Ok(())
 }
 
 #[test]
@@ -109,15 +98,13 @@ fn invalid_url_is_not_valid() {
 }
 
 #[test]
-fn converts_dat_url_into_string() {
+fn converts_dat_url_into_string() -> Result<(), ParseError> {
+    let dat_url = DatUrl::parse(
+        "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path.txt",
+    )?;
     assert_eq!(
         "dat://584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path.txt",
-        format!(
-            "{}",
-            DatUrl::parse(
-                "584faa05d394190ab1a3f0240607f9bf2b7e2bd9968830a11cf77db0cea36a21+0.0.0.1/path.txt"
-            )
-            .expect("invalid test data")
-        )
+        format!("{}", &dat_url)
     );
+    Ok(())
 }
